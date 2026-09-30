@@ -1,0 +1,16 @@
+.DS_Store
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+
+# подписанные данные запуска для локальной разработки
+.env.local
+
+# Зависимости и результаты сборки — восстанавливаются командой
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+.pytest_cache/

@@ -1,0 +1,807 @@
+/* Тема MAX поверх HeroUI v3.
+ *
+ * Значения сняты с макета дизайна: таблица токенов на странице
+ * «Тема MAX → HeroUI» плюс фактические вычисленные стили экранов.
+ * Где макет расходится сам с собой, рядом стоит комментарий.
+ */
+
+:root,
+[data-theme="light"] {
+  --background: #edeef2;
+  --surface: #ffffff;
+  --surface-secondary: #f5f7fa;
+  --foreground: #060708;
+
+  --muted: #656566;
+  /* На экранах подписи отрисованы полупрозрачным, а не --muted из таблицы.
+     Для совпадения с макетом используем отрисованное значение. */
+  --text-secondary: rgba(6, 7, 8, 0.68);
+
+  --default: #e9ebf1;
+  --default-foreground: #060708;
+
+  --accent: #006ee5;
+  --accent-foreground: #ffffff;
+  --accent-soft: #e5f0ff;
+  /* Текст на --accent-soft: в макете темнее, чем --link */
+  --accent-soft-foreground: #0055b3;
+
+  --link: #0062cc;
+
+  --success: #1abe43;
+  --success-foreground: #ffffff;
+  --warning: #ff9500;
+  --warning-soft-foreground: #8a4b00;
+  --danger: #d70015;
+  --danger-foreground: #ffffff;
+
+  --separator: rgba(12, 13, 14, 0.08);
+  --overlay: #ffffff;
+  --backdrop: rgba(12, 13, 14, 0.32);
+
+  /* Только для пометки «Тестовые данные» — требование брифа */
+  --test: #5a0fe0;
+  --test-soft: #f1e9ff;
+
+  /* Поля кита (сейчас из кита только чекбокс). У HeroUI рамки у полей нет:
+     в светлой теме её заменяет тень, а в тёмной — ничто, и пустой чекбокс
+     на карточке пропадал вовсе. Рамка своя, одинаковая в обеих темах. */
+  --field-border-width: 1.5px;
+  --field-border: rgba(6, 7, 8, 0.34);
+  --field-background: transparent;
+  --field-shadow: 0 0 0 0 transparent inset;
+}
+
+.dark,
+[data-theme="dark"] {
+  --background: #0f0f12;
+  --surface: #25262d;
+  --surface-secondary: #17181c;
+  --foreground: #ffffff;
+
+  --muted: rgba(255, 255, 255, 0.64);
+  --text-secondary: rgba(255, 255, 255, 0.64);
+
+  --default: #434455;
+  --default-foreground: #ffffff;
+
+  --accent: #006ee5;
+  --accent-foreground: #ffffff;
+  --accent-soft: #1e3757;
+  --accent-soft-foreground: #479fff;
+
+  --link: #479fff;
+
+  --success: #2bc644;
+  --success-foreground: #0f0f12;
+  --warning: #ff9f0a;
+  --warning-soft-foreground: #ffb340;
+  --danger: #ff8a92;
+  --danger-foreground: #0f0f12;
+
+  --separator: rgba(255, 255, 255, 0.08);
+  --overlay: #25262d;
+  --backdrop: rgba(13, 13, 13, 0.64);
+
+  --test: #c4a3ff;
+  --test-soft: #2a1f3d;
+
+  --field-border-width: 1.5px;
+  --field-border: rgba(255, 255, 255, 0.44);
+  --field-background: transparent;
+  --field-shadow: 0 0 0 0 transparent inset;
+}
+
+/* ——— Цветовые гаммы («Аккаунт» → «Цвет оформления», lib/palette.ts) ———
+   Синяя — значения выше. Зелёная и фиолетовая меняют только основной и
+   вторичный цвет: кнопки, ссылки, выбранные вкладки и переключатели,
+   мягкие подложки вторичных кнопок и обводки. Фоны экранов и блоков —
+   те же, что в синей (просьба пользователя). Текст на акценте и ссылки
+   держат контраст не ниже 4,5:1 в обеих темах.
+   Смысловые цвета не трогаем: «успех» зелёный и в зелёной гамме — поэтому
+   её акцент глубокий изумрудный, а не травяной, как --success. В
+   фиолетовой гамме пометка «Тестовые данные» становится малиновой:
+   фиолетовая слилась бы с акцентом, а бриф требует, чтобы её было видно. */
+
+:root[data-palette="green"] {
+  --accent: #00805a;
+  --accent-soft: #e1f4ea;
+  --accent-soft-foreground: #00613f;
+  --link: #007a52;
+}
+
+:root.dark[data-palette="green"],
+:root[data-theme="dark"][data-palette="green"] {
+  --accent: #00805a;
+  --accent-soft: #163a29;
+  --accent-soft-foreground: #52d496;
+  --link: #45c98a;
+}
+
+:root[data-palette="violet"] {
+  --accent: #6e3fe0;
+  --accent-soft: #efe8ff;
+  --accent-soft-foreground: #5122bd;
+  --link: #6532d6;
+
+  --test: #b0105a;
+  --test-soft: #fde7f0;
+}
+
+:root.dark[data-palette="violet"],
+:root[data-theme="dark"][data-palette="violet"] {
+  --accent: #6e3fe0;
+  --accent-soft: #2d2350;
+  --accent-soft-foreground: #b9a2ff;
+  --link: #b39aff;
+
+  --test: #ff8fbd;
+  --test-soft: #3d1d2c;
+}
+
+:root {
+  /* Радиусы MAX вместо pill-скруглений HeroUI */
+  --radius: 8px;
+  --radius-field: 12px;
+  --radius-2xl: 16px;
+
+  /* Острова MAX — без теней */
+  --surface-shadow: none;
+  --shadow-surface: none;
+}
+
+@theme inline {
+  --color-text-secondary: var(--text-secondary);
+  --color-accent-soft-foreground: var(--accent-soft-foreground);
+  --color-test: var(--test);
+  --color-test-soft: var(--test-soft);
+  --color-warning-soft-foreground: var(--warning-soft-foreground);
+}
+
+/* Системный шрифтовой стек MAX. Цифры — моноширинные,
+   иначе суммы и остатки «прыгают» при пересчёте. */
+html {
+  font-family: -apple-system, BlinkMacSystemFont, system-ui, "Helvetica Neue", Roboto,
+    "Segoe UI", sans-serif;
+  -webkit-text-size-adjust: 100%;
+  /* Два пальца вбок по тачпаду браузер понимает как «назад по истории
+     вкладки» — в веб-версии MAX это увело бы с мини-приложения. Шаг назад
+     делает свой жест (components/SwipeBack.tsx). */
+  overscroll-behavior-x: none;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 16px;
+  line-height: 20px;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+  /* Убирает зум по двойному касанию там, где user-scalable игнорируется. */
+  touch-action: manipulation;
+}
+
+/* ——— Движение ———
+   Короткие проявления вместо мгновенной подмены: откуда взялся экран,
+   панель или строка. Кривая одна на всё приложение — быстрый старт и
+   мягкая остановка (ease-out quint): движение читается как физическое,
+   а не как «проехало с постоянной скоростью».
+
+   Сдвигаем не обёртку экрана, а её содержимое: transform у предка делает
+   его точкой отсчёта для position: fixed, и закреплённая панель внизу на
+   время анимации уезжала бы в конец длинной страницы.
+
+   Заполнение — backwards: по окончании у элемента снова свои стили, и
+   нажатие может его «вдавить». С both конечный кадр перебивал бы :active. */
+
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  /* Как листаются экраны в iOS и в самом MAX */
+  --ease-nav: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes drop-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes from-right {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes from-left {
+  from { opacity: 0; transform: translateX(-28px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes zoom-in {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes bar-in {
+  from { transform: translate(-50%, 100%); }
+  to   { transform: translate(-50%, 0); }
+}
+@keyframes sheet-in {
+  from { transform: translateY(100%); }
+  to   { transform: none; }
+}
+@keyframes sheet-out {
+  from { transform: none; }
+  to   { transform: translateY(100%); }
+}
+@keyframes fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+@keyframes badge-pop {
+  0%   { opacity: 0; transform: scale(0.4); }
+  60%  { opacity: 1; transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+@keyframes grow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes toast-out {
+  from { opacity: 1; transform: none; }
+  to   { opacity: 0; transform: translateY(12px) scale(0.98); }
+}
+
+/* Экраны без View Transitions (старый вебвью): проявляется только новый.
+   Вглубь — справа, назад — слева, вкладки — лёгкий подъём. Где переходы
+   браузера есть, этим занимаются они (ниже), и двойного движения нет. */
+html:not(.vt) .screen-tab > *,
+html:not(.vt) .screen-push > *,
+html:not(.vt) .screen-pop > * { animation: fade-in 0.24s ease-out backwards; }
+html:not(.vt) .screen-tab > * > :not(.bottom-bar) { animation: rise-in 0.3s var(--ease-out) backwards; }
+html:not(.vt) .screen-push > * > :not(.bottom-bar) { animation: from-right 0.32s var(--ease-out) backwards; }
+html:not(.vt) .screen-pop > * > :not(.bottom-bar) { animation: from-left 0.32s var(--ease-out) backwards; }
+
+/* ——— Переходы между экранами (View Transitions) ———
+   Браузер снимает снимок старого экрана и ведёт оба одновременно. Вглубь
+   новый экран наезжает справа поверх старого, а старый чуть сдвигается и
+   притеняется — как в самом мессенджере. Назад — зеркально. Между
+   вкладками — смена без сдвига, меню остаётся на месте. */
+
+@keyframes vt-push-in   { from { transform: translateX(100%); } }
+@keyframes vt-push-out  { to   { transform: translateX(-24%); opacity: 0.6; } }
+@keyframes vt-pop-in    { from { transform: translateX(-24%); opacity: 0.6; } }
+@keyframes vt-pop-out   { to   { transform: translateX(100%); } }
+@keyframes vt-fade-out  { to   { opacity: 0; } }
+@keyframes vt-rise-in   { from { opacity: 0; transform: translateY(8px); } }
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.36s;
+  animation-timing-function: var(--ease-nav);
+  animation-fill-mode: both;
+}
+/* Под уезжающим экраном — фон приложения, а не белая вспышка. */
+::view-transition { background: var(--background); }
+
+html[data-nav="push"]::view-transition-old(root) { animation-name: vt-push-out; }
+html[data-nav="push"]::view-transition-new(root) {
+  animation-name: vt-push-in;
+  box-shadow: -10px 0 28px rgba(0, 0, 0, 0.14);
+}
+html[data-nav="pop"]::view-transition-old(root) {
+  animation-name: vt-pop-out;
+  z-index: 2;
+  box-shadow: -10px 0 28px rgba(0, 0, 0, 0.14);
+}
+html[data-nav="pop"]::view-transition-new(root) { animation-name: vt-pop-in; z-index: 1; }
+
+/* Вкладки: меню — отдельным слоем, оно не участвует в смене экрана. */
+html[data-nav="tab"] .tab-bar { view-transition-name: tab-bar; }
+html[data-nav="tab"]::view-transition-old(root) {
+  animation: vt-fade-out 0.16s ease-out both;
+}
+html[data-nav="tab"]::view-transition-new(root) {
+  animation: vt-rise-in 0.34s var(--ease-out) both;
+}
+::view-transition-group(tab-bar) { animation-duration: 0.2s; }
+
+/* Шаг внутри экрана — открыть или закрыть шторку — без перехода. */
+html[data-nav="none"]::view-transition-group(*),
+html[data-nav="none"]::view-transition-old(*),
+html[data-nav="none"]::view-transition-new(*) { animation: none; }
+
+/* Нижняя панель действий выезжает снизу — и при открытии экрана, и когда
+   появляется по ходу (первая позиция в корзине). */
+.bottom-bar { animation: bar-in 0.34s var(--ease-out) backwards; }
+
+/* Списки проявляются лесенкой: первые строки — сразу, дальше с шагом. */
+.stagger > * { animation: rise-in 0.36s var(--ease-out) backwards; }
+.stagger > :nth-child(2) { animation-delay: 35ms; }
+.stagger > :nth-child(3) { animation-delay: 70ms; }
+.stagger > :nth-child(4) { animation-delay: 105ms; }
+.stagger > :nth-child(5) { animation-delay: 140ms; }
+.stagger > :nth-child(6) { animation-delay: 170ms; }
+.stagger > :nth-child(7) { animation-delay: 200ms; }
+.stagger > :nth-child(n + 8) { animation-delay: 225ms; }
+
+/* Раскрытая панель, ошибка, подсказка — всё, что появляется по ходу. */
+.anim-drop { animation: drop-in 0.28s var(--ease-out) backwards; }
+.anim-fade { animation: fade-in 0.26s ease-out backwards; }
+.anim-rise { animation: rise-in 0.34s var(--ease-out) backwards; }
+.anim-zoom { animation: zoom-in 0.3s var(--ease-out) backwards; }
+.anim-badge { animation: badge-pop 0.36s var(--ease-out) backwards; }
+.anim-grow { transform-origin: left; animation: grow 0.6s var(--ease-out) backwards; }
+
+details[open] > :not(summary) { animation: drop-in 0.26s var(--ease-out) backwards; }
+
+/* Раскрытие по высоте: соседи внизу плавно отъезжают, а не прыгают. */
+.expand {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 0.32s var(--ease-out),
+    opacity 0.22s ease;
+}
+.expand[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.expand > * {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Шторка снизу: карточка товара, просмотр снимка, «Связаться». */
+.sheet-backdrop { animation: fade-in 0.26s ease-out backwards; }
+.sheet-panel { animation: sheet-in 0.4s var(--ease-out) backwards; }
+.sheet-closing .sheet-backdrop { animation: fade-out 0.22s ease-in both; }
+.sheet-closing .sheet-panel { animation: sheet-out 0.24s var(--ease-in) both; }
+/* Смахнутую шторку довозит её собственный переход — анимация закрытия
+   начала бы с исходной точки, и шторка прыгнула бы вверх. */
+.sheet-closing.sheet-dragged .sheet-backdrop,
+.sheet-closing.sheet-dragged .sheet-panel { animation: none; }
+
+/* На компьютере шторку закрывают крестиком и тянут мышью за полосу сверху;
+   на телефоне крестик не нужен — там её смахивают. Крестик с запасом от
+   края: у самого угла по нему промахивались и попадали мимо окна. */
+.sheet-close { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .sheet-handle { min-height: 60px; cursor: grab; }
+  .sheet-handle:active { cursor: grabbing; }
+  .sheet-close {
+    display: flex;
+    top: 14px;
+    right: 16px;
+    width: 34px;
+    height: 34px;
+  }
+  .sheet-close svg { width: 18px; height: 18px; }
+  .sheet-close:hover { background: color-mix(in oklab, var(--default) 70%, var(--foreground) 10%); }
+}
+
+/* Загрузка: по заглушке пробегает блик, а не мигает вся карточка.
+   Появляется с задержкой — быстрый ответ не успевает её показать, и
+   экран не дёргается «заглушка — данные» за долю секунды. */
+@keyframes shimmer {
+  to { transform: translateX(100%); }
+}
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface);
+  animation: fade-in 0.3s ease-out 0.14s backwards;
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    color-mix(in oklab, var(--default) 60%, transparent) 50%,
+    transparent 80%
+  );
+  animation: shimmer 1.3s ease-in-out infinite;
+}
+
+/* Плитка позиции без фото: оттенок — из названия (ItemTile). */
+.item-tile {
+  background: oklch(0.93 0.045 var(--tile-hue));
+  color: oklch(0.52 0.12 var(--tile-hue));
+}
+.dark .item-tile,
+[data-theme="dark"] .item-tile {
+  background: oklch(0.34 0.05 var(--tile-hue));
+  color: oklch(0.8 0.1 var(--tile-hue));
+}
+
+/* Снимок проявляется, когда загрузился, а не рисуется построчно. */
+.photo { opacity: 0; transition: opacity 0.35s ease; }
+.photo[data-loaded="true"] { opacity: 1; }
+
+/* Новая строка, пришедшая по сокету, коротко подсвечивается: видно, что
+   появилось, пока смотрел. */
+@keyframes flash-new {
+  from { background-color: color-mix(in oklab, var(--accent) 16%, var(--surface)); }
+}
+.anim-new { animation: flash-new 1.8s ease-out; }
+
+/* Число поменялось — сумма корзины, количество: коротко «подпрыгивает». */
+@keyframes bump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+.anim-bump { display: inline-block; animation: bump 0.32s var(--ease-out); }
+
+/* Шаг внутри шторки: вперёд — справа, назад — слева. */
+.step-forward { animation: from-right 0.3s var(--ease-out) backwards; }
+.step-back { animation: from-left 0.3s var(--ease-out) backwards; }
+
+/* Стрелка «назад»: под пальцем — кружок, по нажатию стрелка коротко уходит
+   влево, и только потом экран уезжает. Видно, что нажатие дошло. */
+@keyframes back-nudge {
+  0%   { translate: 0 0; }
+  45%  { translate: -6px 0; }
+  100% { translate: -3px 0; }
+}
+@keyframes back-ring {
+  from { opacity: 0.22; transform: scale(0.45); }
+  to   { opacity: 0; transform: scale(1.1); }
+}
+/* Стрелка жеста «назад» от левого края: выезжает за пальцем и темнеет,
+   когда отпустить уже можно. */
+.swipe-back {
+  position: fixed;
+  left: 0;
+  z-index: 55;
+  display: flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--link);
+  box-shadow: 0 2px 10px rgb(0 0 0 / 0.18);
+  opacity: 0;
+  transform: translateX(-40px);
+  pointer-events: none;
+  transition: background-color 0.15s, color 0.15s;
+}
+.swipe-back[data-armed="true"] {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.back-btn { position: relative; }
+.back-btn::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 999px;
+  background: var(--link);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+.back-btn:active::before { opacity: 0.1; }
+.back-btn svg { transition: translate 0.12s var(--ease-out); }
+.back-btn:active svg { translate: -2px 0; }
+.back-btn[data-going="true"]::before { animation: back-ring 0.34s var(--ease-out) forwards; }
+.back-btn[data-going="true"] svg { animation: back-nudge 0.3s var(--ease-out) forwards; }
+
+.toast-in { animation: toast-in 0.34s var(--ease-out) both; }
+.toast-out { animation: toast-out 0.2s var(--ease-in) both; }
+
+/* Нажатие: кнопка чуть проседает под пальцем — видно, что касание дошло. */
+button,
+a,
+label {
+  transition:
+    transform 0.14s var(--ease-out),
+    background-color 0.2s ease,
+    color 0.2s ease,
+    opacity 0.2s ease;
+}
+button:not(:disabled):active,
+a:active,
+label:has(> input[type="file"]):active {
+  transform: scale(0.97);
+}
+
+/* Нажатие на вкладку: иконка коротко подпрыгивает. */
+@keyframes tab-pop {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.22); }
+  100% { transform: scale(1.08); }
+}
+
+.tab-active .tab-icon {
+  animation: tab-pop 0.28s var(--ease-out) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* Шкала MAX. Имена — из страницы темы в макете. */
+.t-header    { font-size: 24px; line-height: 28px; font-weight: 600; }
+.t-subheader { font-size: 20px; line-height: 24px; font-weight: 600; }
+.t-title     { font-size: 17px; line-height: 22px; font-weight: 600; }
+.t-body      { font-size: 16px; line-height: 20px; font-weight: 400; }
+.t-detail    { font-size: 15px; line-height: 20px; font-weight: 400; }
+.t-desc      { font-size: 13px; line-height: 16px; font-weight: 400; }
+.t-label     { font-size: 12px; line-height: 16px; font-weight: 400; }
+
+/* Мини-приложение открывается и в веб-версии MAX, где окно широкое.
+   Без ограничения список растягивается через весь монитор и читать его
+   невозможно. Ширину можно расширить на конкретном экране через --app-width. */
+#root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#root > * {
+  width: 100%;
+  max-width: var(--app-width, 560px);
+}
+
+/* Закреплённый низ позиционируется от окна, поэтому центрируем его отдельно. */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--app-width, 560px);
+}
+
+/* Шапка экрана вглубь держится наверху: стрелка «назад» должна быть под
+   рукой и на длинной странице, и когда клавиатура сдвинула вебвью. */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  background: var(--background);
+}
+
+/* Нижнее меню и панель действий делят низ экрана: панель ложится над меню,
+   иначе «оформить» оказывалось бы под вкладками. */
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--app-width, 560px);
+  z-index: 20;
+}
+
+.has-tabs .bottom-bar {
+  bottom: var(--tabbar-height, 62px);
+}
+
+/* ——— Переключатель в строке настройки (HeroUI Switch) ———
+   Крупнее, чем у кита по умолчанию, и круглый — как в настройках MAX:
+   по маленькому бегунку палец промахивается. */
+.switch-row { --switch-control-bg-checked-hover: var(--accent); }
+.switch-row .switch__content { width: 100%; }
+.switch-row .switch__control {
+  width: 48px;
+  height: 28px;
+  border-radius: 999px;
+}
+.switch-row .switch__thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  margin-inline-start: 2px;
+}
+.switch-row[data-selected="true"] .switch__thumb { margin-inline-start: calc(100% - 26px); }
+
+/* ——— «В работе / История» (HeroUI Tabs) ——— */
+.segmented .tabs__list-container {
+  background: var(--default);
+  border-radius: 12px;
+}
+.segmented .tabs__list { width: 100%; padding: 3px; }
+.segmented__tab {
+  height: 34px;
+  border-radius: 9px;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.segmented__tab[data-selected="true"] { color: var(--foreground); }
+.segmented__indicator {
+  border-radius: 9px;
+  background: var(--surface);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.segmented__count {
+  min-width: 18px;
+  border-radius: 999px;
+  background: var(--accent);
+  padding: 0 5px;
+  color: var(--accent-foreground);
+  font-size: 11px;
+  line-height: 18px;
+}
+
+/* ——— Календарь дат доставки (HeroUI Calendar, экран 10) ———
+   Во всю ширину карточки, а не 252 px, как у всплывающего календаря кита;
+   ячейки ниже квадрата, чтобы месяц не растягивался на пол-экрана, и не
+   шире 56 px — в широком окне выбранный день иначе вытягивался в полосу.
+   Погашенные дни — все одинаково, без зачёркивания: вне графика и за
+   горизонтом заявку одинаково не примут. */
+.delivery-calendar { width: 100%; max-width: none; }
+.delivery-calendar .calendar__header { padding-bottom: 8px; }
+.delivery-calendar .calendar__nav-button { width: 36px; height: 36px; }
+.delivery-calendar .calendar__header-cell { font-size: 13px; }
+.delivery-calendar .calendar__cell {
+  aspect-ratio: auto;
+  height: 40px;
+  max-width: 56px;
+  justify-self: center;
+  font-size: 15px;
+}
+.delivery-calendar .calendar__cell[data-disabled="true"] { text-decoration: none; }
+
+/* ——— Широкий экран: боковое меню вместо нижнего ———
+   Развёрнутое окно MAX на компьютере: разделы слева, контент шире, шторки —
+   окнами по центру, у кнопок — курсор-рука и подсветка под мышью. */
+/* Меню рисуется прямым потомком #root, и общее правило ширины экрана
+   (#root > *) растягивало его на 760 px поверх контента — отсюда #root. */
+#root > .sidebar,
+.sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 25;
+  display: flex;
+  width: var(--sidebar-w, 248px);
+  max-width: none;
+  flex-direction: column;
+  gap: 8px;
+  border-right: 1px solid var(--separator);
+  background: var(--surface-secondary);
+  padding: 12px 8px;
+  /* При переходе между экранами меню стоит на месте, а не уезжает
+     вместе со снимком страницы. */
+  view-transition-name: sidebar;
+}
+.sidebar__who {
+  display: block;
+  border-radius: 12px;
+  padding: 10px 12px 12px;
+}
+.sidebar__tabs,
+.sidebar__tabs .tabs__list-container { width: 100%; }
+.sidebar__tabs .tabs__list-container { background: transparent; }
+.sidebar__tabs .tabs__list { width: 100%; gap: 2px; padding: 0; }
+.sidebar__tab {
+  height: 44px;
+  min-width: 0 !important;
+  justify-content: flex-start;
+  gap: 12px;
+  border-radius: 12px;
+  padding: 0 12px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.sidebar__tab[data-selected="true"] { color: var(--link); }
+.sidebar__icon { width: 22px; height: 22px; flex-shrink: 0; }
+.sidebar__indicator {
+  border-radius: 12px;
+  background: var(--accent-soft);
+  box-shadow: none;
+}
+.sidebar__badge {
+  display: flex;
+  min-width: 20px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--danger);
+  padding: 0 6px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+@keyframes dialog-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes dialog-out {
+  from { opacity: 1; transform: none; }
+  to   { opacity: 0; transform: translateY(10px) scale(0.98); }
+}
+
+@media (min-width: 960px) {
+  :root { --sidebar-w: 248px; }
+
+  #root { padding-left: var(--sidebar-w); }
+  #root > * { max-width: var(--app-width-wide, 760px); }
+
+  /* Нижнее меню не нужно — разделы в боковом. */
+  .tab-bar { display: none; }
+  .has-tabs { padding-bottom: 0; }
+  .has-tabs .bottom-bar { bottom: 0; }
+
+  /* Закреплённый низ — по центру контента, а не всего окна. */
+  .bottom-bar {
+    left: calc(var(--sidebar-w) + (100% - var(--sidebar-w)) / 2);
+    width: calc(100% - var(--sidebar-w));
+    max-width: var(--app-width-wide, 760px);
+  }
+  .toast-layer { left: var(--sidebar-w); }
+
+  /* Каталог и полка — по три карточки в ряд. */
+  .catalog-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+  /* Шторка на компьютере — окно по центру: снизу во весь монитор она
+     читалась как оторвавшийся кусок телефона. */
+  .sheet-panel {
+    top: 0;
+    bottom: 0;
+    height: fit-content;
+    max-height: min(84dvh, 760px);
+    width: min(560px, calc(100% - 48px));
+    margin: auto;
+    border-radius: 20px;
+    animation: dialog-in 0.28s var(--ease-out) backwards;
+  }
+  .sheet-closing .sheet-panel { animation: dialog-out 0.2s var(--ease-in) both; }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  button:not(:disabled),
+  a[href],
+  [role="tab"],
+  label:has(> input[type="file"]) { cursor: pointer; }
+
+  /* Подсветка под мышью — у карточек и кнопок, а не у текста. */
+  a[href].rounded-2xl:hover,
+  a[href].rounded-xl:hover,
+  button.rounded-2xl:not(:disabled):hover,
+  button.rounded-xl:not(:disabled):hover {
+    box-shadow: inset 0 0 0 999px color-mix(in oklab, var(--foreground) 5%, transparent);
+  }
+  .sidebar__who:hover { background: color-mix(in oklab, var(--foreground) 5%, transparent); }
+}
+
+/* На телефоне :hover «залипает» после касания, и у отмеченного чекбокса
+   поверх заливки оставалось кольцо рамки. У отмеченного рамки нет вовсе —
+   селектор усилен, чтобы перебить состояния наведения из кита. */
+.checkbox.checkbox[data-selected="true"] .checkbox__control.checkbox__control {
+  border-color: transparent;
+}

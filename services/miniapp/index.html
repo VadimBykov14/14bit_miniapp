@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="ru" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Масштаб фиксирован: это интерфейс внутри мессенджера, а не страница.
+         Случайный щипок или двойное касание по карточке увеличивали окно,
+         и вернуться к исходному масштабу внутри вебвью нечем. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#EDEEF2" />
+    <title>Витрина поставщика</title>
+    <!-- MAX Bridge: даёт window.WebApp, инициализации не требует -->
+    <script src="https://st.max.ru/js/max-web-app.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

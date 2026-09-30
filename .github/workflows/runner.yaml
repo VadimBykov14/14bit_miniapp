@@ -1,0 +1,27 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+# Две выкатки подряд не должны пересекаться: вторая ждёт первую.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # Раннер стоит на самом сервере стенда. Его пользователь должен быть
+    # в группе docker и иметь право записи в /opt/max26.
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build
+        run: ./build.sh
+
+      - name: Deploy
+        run: ./deploy.sh

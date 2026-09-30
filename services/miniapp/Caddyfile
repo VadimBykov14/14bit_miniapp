@@ -1,0 +1,10 @@
+# Статика мини-приложения. TLS и домен — на внешнем Caddy.
+:8080 {
+	root * /srv
+	encode gzip
+
+	# SPA: любой неизвестный путь отдаёт index.html, иначе прямой заход
+	# на /s/confectionery вернёт 404.
+	try_files {path} /index.html
+	file_server
+}

@@ -1,0 +1,12 @@
+# Версии закреплены точно: сборка на чистой машине должна дать то же, что
+# прошло проверки, а не то, что вышло вчера.
+fastapi==0.141.1
+uvicorn[standard]==0.54.0
+sqlalchemy[asyncio]==2.1.1
+asyncpg==0.31.0
+httpx==0.28.1
+minio==7.2.20
+python-multipart==0.0.32
+alembic==1.20.0
+openpyxl==3.1.5
+cryptography==43.0.3

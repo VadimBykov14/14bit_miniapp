@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Тестовая 1С — настройка баз</title>
+<!--
+  Кабинет эмулятора 1С. Страница и скрипт ui.js без сборки: это служебный
+  инструмент стенда, и тащить ради него второй фронтенд со своим npm было бы
+  дороже, чем он стоит. Скрипт отдельным файлом — ради политики безопасности
+  (CSP): встроенные скрипты на этой странице запрещены.
+-->
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f4f5f7; --card: #fff; --line: #e3e5ea; --text: #16181d;
+    --muted: #6b7280; --accent: #2f6fed; --danger: #c0392b; --ok: #1f7a4d;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #15171c; --card: #1d2026; --line: #2b2f37; --text: #eceef2;
+            --muted: #9aa1ad; --accent: #6b9bff; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.45 -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 20px 16px 64px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 16px; margin: 24px 0 10px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+          padding: 16px; margin-bottom: 12px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .grow { flex: 1 1 160px; min-width: 0; }
+  button, input, select { font: inherit; }
+  input, select { padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px;
+                  background: var(--bg); color: var(--text); }
+  button { padding: 8px 14px; border: 0; border-radius: 9px; background: var(--accent);
+           color: #fff; cursor: pointer; }
+  button.ghost { background: transparent; color: var(--accent); padding: 8px 6px; }
+  button.bad { background: transparent; color: var(--danger); }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line);
+           vertical-align: middle; }
+  th { color: var(--muted); font-weight: 500; font-size: 13px; }
+  td input { width: 100%; }
+  .num { width: 84px; }
+  .muted { color: var(--muted); font-size: 13px; }
+  .key { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px;
+         word-break: break-all; }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .tabs button { background: var(--card); color: var(--text); border: 1px solid var(--line); }
+  .tabs button[aria-current="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .note { background: color-mix(in oklab, var(--ok) 12%, transparent); color: var(--ok);
+          padding: 10px 12px; border-radius: 10px; font-size: 13px; margin-bottom: 12px; }
+  .live { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px;
+          margin: -8px 0 16px; }
+  .live::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ok);
+                  animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .35; } }
+  .lines { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .sum { white-space: nowrap; text-align: right; }
+  /* Новое и изменившееся коротко подсвечивается: видно, что пришло из
+     приложения, а не было здесь всегда. */
+  @keyframes flash { from { background: color-mix(in oklab, var(--accent) 22%, transparent); } }
+  .flash { animation: flash 2.4s ease-out; }
+  .tag { display: inline-block; padding: 1px 7px; border-radius: 7px; font-size: 12px; white-space: nowrap; }
+  .tag.wait { background: color-mix(in oklab, #d99a00 18%, transparent); color: #b07d00; }
+  .tag.ok { background: color-mix(in oklab, var(--ok) 14%, transparent); color: var(--ok); }
+  .tag.off { background: color-mix(in oklab, var(--muted) 16%, transparent); color: var(--muted); }
+  tr.gone td { color: var(--muted); }
+  .error { color: var(--danger); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Тестовая база 1С</h1>
+  <p class="sub">
+    Отвечает по стандартному OData «1С:Предприятие 8». Данные синтетические —
+    это стенд для проверки обмена, а не боевой учёт. Страница открыта без входа
+    намеренно: она нужна, чтобы завести базу и получить ключ.
+  </p>
+
+  <p class="live" id="live">Обновляется сам: заказы и остатки из приложения появляются без перезагрузки</p>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="card">
+    <div class="row">
+      <input class="grow" id="new-base" placeholder="Название новой базы">
+      <label class="muted"><input type="checkbox" id="copy-items" checked> с демо-номенклатурой</label>
+      <button data-act="create-base">Создать базу</button>
+    </div>
+  </div>
+
+  <div id="base"></div>
+</div>
+
+<script src="/1c/ui.js"></script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: max26
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-max26}
+      POSTGRES_DB: max26
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U max26"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Docker Hub отдаёт образ MinIO не отовсюду — берём с quay.io,
+  # это официальное зеркало проекта.
+  s3:
+    image: quay.io/minio/minio:latest
+    restart: unless-stopped
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY:-max26}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-max26secret}
+    volumes:
+      - s3_data:/data
+
+  api:
+    build:
+      context: .
+      dockerfile: services/api/Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+asyncpg://max26:${POSTGRES_PASSWORD:-max26}@db:5432/max26
+      MAX_BOT_TOKEN: ${MAX_BOT_TOKEN:?нужен токен бота}
+      BOT_INTERNAL_URL: http://bot:8080
+      DEMO_MAX_USER_ID: ${DEMO_MAX_USER_ID:-491411422}
+      # Боевой режим обмена: клиент говорит по стандартному OData
+      # «1С:Предприятие 8». На стенде на том же контракте отвечает mock-1c.
+      ONEC_MODE: ${ONEC_MODE:-odata}
+      # У каждой базы свой путь и свой ключ. Это умолчание стенда —
+      # предприятие может указать свою базу в кабинете.
+      ONEC_URL: ${ONEC_URL:-http://mock-1c:8080/demo}
+      # Адрес стенда без базы: путь к конкретной базе выводится из ключа,
+      # который выдаёт её кабинет.
+      ONEC_STAND_URL: ${ONEC_STAND_URL:-http://mock-1c:8080}
+      ONEC_USER: ${ONEC_USER:-exchange}
+      ONEC_PASSWORD: ${ONEC_DEMO_KEY:-demo.stand-demo-key}
+      ONEC_PRICE_KIND: ${ONEC_PRICE_KIND:-Оптовая}
+      APP_TIMEZONE: ${APP_TIMEZONE:-Europe/Moscow}
+      # Сколько приглашений в день владелец рассылает ботом из «Кто запускал бота».
+      AUDIENCE_INVITES_PER_DAY: ${AUDIENCE_INVITES_PER_DAY:-20}
+      # Тестовые боты — вторая сторона сценария для проверяющих (app/testbots.py).
+      # TEST_BOTS=0 выключает. TEST_BOTS_BASES — слаги тестовых баз, к витринам
+      # на которых приходит бот-магазин; пусто — любая тестовая база, кроме демо.
+      # Умолчание — база стенда со служебного слайда: к витринам живых
+      # тестировщиков бот не просится. В .env.example переменная пустая, и своя
+      # копия пускает бота к любой тестовой базе.
+      TEST_BOTS: ${TEST_BOTS:-1}
+      TEST_BOTS_BASES: ${TEST_BOTS_BASES-base-c117db}
+      S3_ENDPOINT: s3:9000
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-max26}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-max26secret}
+      S3_BUCKET: ${S3_BUCKET:-max26}
+    depends_on:
+      db:
+        condition: service_healthy
+      s3:
+        condition: service_started
+      mock-1c:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/health').read()"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+
+  # Эмулятор 1С с тем же OData-интерфейсом, что и боевая база. Явно
+  # помечен тестовым: на демо реальная база недоступна, и мы не имитируем
+  # интеграцию, а изолируем её за контрактом.
+  mock-1c:
+    build:
+      context: .
+      dockerfile: services/mock-1c/Dockerfile
+    restart: unless-stopped
+    environment:
+      ONEC_DEMO_KEY: ${ONEC_DEMO_KEY:-demo.stand-demo-key}
+    volumes:
+      - onec_data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health').read()"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  bot:
+    build:
+      context: .
+      dockerfile: services/bot-service/Dockerfile
+    restart: unless-stopped
+    environment:
+      MAX_BOT_TOKEN: ${MAX_BOT_TOKEN:?нужен токен бота}
+      WEBHOOK_SECRET: ${WEBHOOK_SECRET:?нужен секрет вебхука}
+      BOT_DOMAIN: ${BOT_DOMAIN:?нужен домен}
+      MAX_API_BASE: ${MAX_API_BASE:-https://botapi.max.ru}
+      API_INTERNAL_URL: http://api:8080
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health').read()"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  miniapp:
+    build: ./services/miniapp
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      BOT_DOMAIN: ${BOT_DOMAIN:?нужен домен}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      bot:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+      miniapp:
+        condition: service_started
+
+volumes:
+  onec_data:
+  s3_data:
+  caddy_data:
+  caddy_config:
+  db_data:
